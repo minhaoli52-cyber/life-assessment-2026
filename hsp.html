@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>你是不是高敏感？</title>
+<style>
+:root{--paper:#f6f2e9;--card:#fffdf8;--ink:#292521;--muted:#5d584f;--accent:#613755;--wash:#f1e3ec;--line:#ded5cc;--error:#9f3829;--serif:"Songti SC","Noto Serif CJK SC","SimSun",serif;--sans:system-ui,"Microsoft YaHei",sans-serif;color:var(--ink);background:var(--paper);font-family:var(--sans);line-height:1.62}
+:root[data-theme="hsp"]{--accent:#285644;--wash:#e2ede2;--line:#d8ddd0;--paper:#f1f3eb}
+*{box-sizing:border-box}
+body{margin:0}
+[hidden]{display:none!important}
+.site{max-width:900px;margin:auto;padding:0 24px 55px}
+.mast{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:23px 0 18px;border-bottom:1px solid var(--line);font-size:.9rem;color:var(--accent)}
+.mark{display:flex;align-items:center;gap:11px;font-weight:750}
+.mark::before{content:"";display:inline-block;width:13px;height:13px;border:2px solid var(--accent);border-radius:50%;box-shadow:inset 0 0 0 2px var(--paper);background:var(--accent)}
+.hero{padding:clamp(28px,5vw,52px) 0 30px}
+.hero h1{font-size:clamp(2rem,6vw,4rem);font-family:var(--serif);line-height:1.13;letter-spacing:-.04em;margin:12px 0 18px;font-weight:800}
+.hero .intro{font-size:clamp(1.04rem,2.5vw,1.25rem);margin:0;max-width:37em}
+.eyebrow{margin:0;font-size:.85rem;color:var(--accent);font-weight:780;letter-spacing:.06em}
+.panel,.question,.report-card{background:var(--card);border:1px solid var(--line);border-radius:18px}
+.panel{padding:clamp(18px,4vw,29px)}
+.panel h2,.heading h2{margin:0 0 10px;font-size:1.32rem}
+.panel p{margin:.55em 0}
+.buttons,.nav{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:23px}
+button{border:1px solid var(--line);font:inherit;font-weight:720;border-radius:10px;padding:10px 18px;color:var(--accent);background:var(--card);min-height:45px;cursor:pointer}
+button:hover{background:var(--wash)}
+.primary{background:var(--accent);color:white;border-color:var(--accent)}
+.primary:hover{filter:brightness(1.15);background:var(--accent)}
+button:disabled{opacity:.48;cursor:default}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.privacy,.fine{color:var(--muted);font-size:.9rem}
+.progress-block{position:sticky;top:0;z-index:2;background:var(--paper);padding:12px 0;border-bottom:1px solid var(--line);margin-bottom:20px}
+.train{display:flex;justify-content:space-between;gap:8px;margin-bottom:8px;font-size:.91rem;font-weight:720}
+progress{width:100%;height:8px;display:block;appearance:none;border:0;border-radius:99px;overflow:hidden;background:var(--line)}
+progress::-webkit-progress-bar{background:var(--line)}
+progress::-webkit-progress-value{background:var(--accent)}
+progress::-moz-progress-bar{background:var(--accent)}
+.heading p{margin:0 0 16px;color:var(--muted)}
+.question{margin:0 0 15px;padding:16px 17px;min-inline-size:0;scroll-margin:78px}
+.question h3{font-size:1.07rem;line-height:1.48;margin:0}
+.qnum{color:var(--accent);font-weight:750;margin-right:9px}
+.dual{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+.dual p{background:var(--paper);padding:9px 12px;margin:0;border-radius:8px;font-size:.96rem}
+.dual b{color:var(--accent);margin-right:7px}
+.options{border:0;padding:0;margin:12px 0 0;min-inline-size:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px}
+:root[data-theme="hsp"] .options{grid-template-columns:repeat(6,minmax(0,1fr))}.choice{position:relative;cursor:pointer}
+.choice input{position:absolute;inset:0;margin:0;width:100%;height:100%;opacity:0;cursor:pointer}
+.choice span{min-height:45px;display:grid;place-items:center;text-align:center;border:1px solid var(--line);border-radius:9px;background:var(--card);font-size:.9rem;padding:7px 1px;line-height:1.25}
+.choice:hover span{background:var(--wash)}
+.choice:has(:checked) span{background:var(--accent);color:white;border-color:var(--accent);font-weight:800}
+.choice:focus-within span{outline:2px solid var(--accent);outline-offset:2px}
+.question.missing{border-color:var(--error)}
+.error{color:var(--error);font-weight:680;margin:10px 0;min-height:1.5em}
+.nav{justify-content:space-between;margin:0 0 17px}
+.result-title{font-size:clamp(2rem,6vw,3.45rem);line-height:1.16;margin:.2em 0;color:var(--accent);font-family:var(--serif);overflow-wrap:anywhere}
+.report-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;margin:16px 0}
+.report-card{padding:16px 18px;min-width:0}
+.report-card h3{margin:0;font-size:1.1rem}
+.report-card p{margin:.5em 0;color:var(--muted)}
+.report-card strong{color:var(--accent)}
+.track{position:relative;height:9px;border-radius:10px;background:var(--wash);margin:13px 0}
+.track.mbti::before{content:"";position:absolute;inset:0 auto 0 50%;width:1px;background:#917f8b}
+.track .dot{position:absolute;top:-3px;width:15px;height:15px;border-radius:50%;background:var(--accent);transform:translateX(-50%);border:2px solid var(--card)}
+.track .fill{height:100%;border-radius:10px;background:var(--accent)}
+.scales{display:flex;justify-content:space-between;gap:6px;font-size:.83rem;color:var(--muted)}
+details{padding:14px 0;border-bottom:1px solid var(--line)}
+summary{cursor:pointer;font-weight:730;color:var(--accent)}
+details p,details li{font-size:.94rem}
+.source-list{padding-left:1.4em}
+a{color:var(--accent);text-underline-offset:3px}
+footer{color:var(--muted);margin-top:26px;font-size:.89rem}
+.sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+#paper{display:none}
+@media(max-width:600px){.site{padding-inline:13px}.dual{grid-template-columns:1fr;gap:6px}.report-grid{grid-template-columns:1fr}.question{padding:13px 11px}.choice span{font-size:.79rem}.options{gap:4px}.hero{padding-top:27px}.mast{padding-top:14px;font-size:.82rem}}
+@media(max-width:420px){:root[data-theme="hsp"] .options{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media print{
+  @page{margin:15mm} :root{background:#fff;color:#000}.site{max-width:none;padding:0}
+  .mast,.hero,.buttons,.progress-block,#start,#exam,#sources,footer{display:none!important}
+  body[data-print="paper"] #paper{display:block}
+  body[data-print="paper"] #result{display:none!important}
+  .print-q,.report-card{break-inside:avoid}
+  .print-q{padding:5px 0 8px;border-bottom:1px solid #bbb}
+  .print-q h3{margin:0;font-size:11pt}
+  .print-q p{margin:3px 0;font-size:9.5pt}
+  .report-card{border-radius:5px}
+}
+</style>
+</head>
+<body>
+<div class="site">
+  <header class="mast"><span class="mark">自我观察问卷</span><span id="time"></span></header>
+  <main>
+    <div class="hero" id="hero">
+      <p class="eyebrow" id="eyebrow"></p>
+      <h1 id="title"></h1>
+      <p class="intro" id="intro"></p>
+    </div>
+    <section class="panel" id="start">
+      <h2>答题前</h2>
+      <p id="instructions"></p>
+      <p id="scope"></p>
+      <div class="buttons"><button type="button" class="primary" id="begin">开始答题</button><button type="button" id="print-paper">打印题目</button></div>
+      <p class="privacy">答案只留在当前页面，关闭或刷新会清空。本页答题和算分均可离线完成。</p>
+    </section>
+    <section id="exam" hidden>
+      <div class="progress-block"><div class="train"><span id="page-count"></span><span id="answered" role="status"></span></div><progress id="progress" aria-label="答题进度"></progress></div>
+      <div class="heading"><h2 id="page-title" tabindex="-1"></h2><p id="page-help"></p></div>
+      <div id="questions"></div>
+      <p class="error" id="message" role="alert"></p>
+      <div class="nav"><button type="button" id="prev">上一页</button><button type="button" class="primary" id="next">下一页</button></div>
+    </section>
+    <section id="result" aria-labelledby="outcome" hidden>
+      <div class="panel">
+        <p class="eyebrow">本次自测结果</p>
+        <h2 class="result-title" id="outcome" tabindex="-1"></h2>
+        <p id="summary-text"></p>
+      </div>
+      <div class="report-grid" id="cards"></div>
+      <div class="panel" id="follow"></div>
+      <details><summary>分数是怎么计算的</summary><p id="scoring"></p></details>
+      <div class="buttons"><button type="button" id="review">回到答题</button><button type="button" id="print-result">打印结果</button><button type="button" id="restart">清空并重答</button></div>
+    </section>
+    <section id="paper"></section>
+    <details id="sources"><summary>题目说明与参考来源</summary><p id="method"></p><ul class="source-list" id="source-list"></ul></details>
+  </main>
+  <footer>仅作个人自我观察。可按真实生活中的体验理解本次结果。</footer>
+</div>
+<noscript>请用支持 JavaScript 的浏览器打开此文件，以便答题与自动计分。</noscript>
+<script>
+const config = {"kind": "hsp", "title": "你是不是高敏感？", "eyebrow": "HSP 深度自评", "intro": "48 道体验题看六组高敏感相关表现，另有 3 题看它们有没有影响你的日常。", "time": "约 8–12 分钟", "instructions": "按过去三个月的日常作答。遇到题目所说的情境时，这个反应通常有多频繁？尽量参考多次经历。若从未遇过所述或相似情境，请选「无法判断」。", "scope": "本问卷为原创自评，参考感觉加工敏感性研究设置六组体验，未经信效度验证。报告没有人群百分位，也不能据此确认某种身份或诊断。", "pageHelp": "当题中的情况出现时，你有多常出现这类反应？", "method": "HSP 通常指高度敏感者。感觉加工敏感性（SPS）研究关注人们在不同环境里的主观反应差异。六组自编题也纳入正向体验，以便呈现恢复、喜爱和注意到细节的部分。工作、休息和活动参与另行观察。", "scoring": "前 48 题按从不至几乎总是记 1 至 5 分，反向题反计。每组报告有效题均分及计分后达 4–5 分的题数。每组至少 6 题可判断才解读，高频题达有效题数的 5/8 时记为该组较常见。达标组数分 0、1–3、4–6 三档，仅用于概括本次回答。最后 3 题单列。", "choices": ["从不", "较少", "有时", "经常", "几乎总是", "无法判断"], "axes": [{"title": "感官不适", "explain": "在声音、光线、气味和触感上的不适。", "action": "先记下最耗力的一种刺激，试一次换座、调光或缩短停留。"}, {"title": "多重刺激负荷", "explain": "刺激和任务叠加时，是否容易超过当下的精力。", "action": "把一个高负荷时段减成单任务，结束后留一段恢复时间，再观察变化。"}, {"title": "人际气氛反应", "explain": "对互动细节、语气和现场气氛的主观反应。", "action": "感觉气氛变了时，记下具体线索。需要处理的事可以直接确认。"}, {"title": "积极体验反应", "explain": "是否容易从温暖、自然、作品或安静环境中受到正向触动。", "action": "有帮助的环境和体验可以记下来，主动留一点时间。"}, {"title": "留意细节", "explain": "对日常环境和信息的小变化，自己是否容易注意到。", "action": "从一个常见场景观察：哪些细节对判断有用，哪些可以先放下。"}, {"title": "深入加工", "explain": "是否习惯在经历之后整理含义、比较解释或延伸联想。", "action": "让有用的思考落到一个记录、问题或行动，观察何时需要结束一轮。"}], "items": [{"axis": 0, "prompt": "餐厅里背景音乐和谈话声叠在一起时，我会因声音不舒服而想换位置。", "reverse": false}, {"axis": 1, "prompt": "有人连续向我提出好几件事时，我需要先停一下才能排清顺序。", "reverse": false}, {"axis": 2, "prompt": "对话的语气突然变得生硬时，我的身体会先紧一下。", "reverse": false}, {"axis": 3, "prompt": "我会因为街角的日光、树影或风感，突然感觉当下很好。", "reverse": false}, {"axis": 4, "prompt": "走进熟悉的房间，我容易发现某件东西的位置变了。", "reverse": false}, {"axis": 5, "prompt": "听到一个新观点后，我会不自觉拿它和以往的经历作比较。", "reverse": false}, {"axis": 0, "prompt": "持续的强光或刺眼反射会让我想找一个遮光的位置。", "reverse": false}, {"axis": 1, "prompt": "聊天、回消息和听背景声音同时发生时，我会很快觉得脑子塞满了。", "reverse": false}, {"axis": 2, "prompt": "听完朋友讲一件让他委屈的事，我还会带着那段谈话的感受一阵子。", "reverse": false}, {"axis": 3, "prompt": "一首喜欢的音乐，有时能让我对这一整段时间的感受显著变好。", "reverse": false}, {"axis": 4, "prompt": "听熟悉的声音时，我会注意到音色或节奏出现小变化。", "reverse": false}, {"axis": 5, "prompt": "一部作品打动我时，我离开之后还会想它有哪些层次。", "reverse": false}, {"axis": 0, "prompt": "别人喷了比较浓的香水时，即使能继续做事，我也会想拉开一点距离。", "reverse": false}, {"axis": 1, "prompt": "内容很密集的会议结束后，我想先安静一会儿才有精力谈下一件事。", "reverse": false}, {"axis": 2, "prompt": "两个人争执时，即使与我无关，我也会被现场的紧张气氛带动。", "reverse": false}, {"axis": 3, "prompt": "一处安静舒服的角落，会让我明显感觉自己更愿意待着、看书或做事。", "reverse": false}, {"axis": 4, "prompt": "阅读一段文字时，我会留意某句话的用词细微不同，带来的意思变化。", "reverse": false}, {"axis": 5, "prompt": "要作一个有分量的普通决定时，我会先想它对之后几步可能有什么影响。", "reverse": false}, {"axis": 0, "prompt": "衣物接缝、吊牌或某种材质摩擦皮肤时，那种不舒服会持续占据注意力。", "reverse": false}, {"axis": 1, "prompt": "一天接连安排许多交互活动时，即使我喜欢这些活动，也会明显觉得累。", "reverse": false}, {"axis": 2, "prompt": "有人耐心听我讲完时，我会明显感觉自己更放松、更愿意继续说。", "reverse": false}, {"axis": 3, "prompt": "别人一个具体的照顾举动，会让我过一段时间想起来还觉得温暖。", "reverse": false}, {"axis": 4, "prompt": "连续几天走同一条路，我容易留意路边陈列或光影的细小变化。", "reverse": false}, {"axis": 5, "prompt": "遇到一次值得回味的对话，我会想起里面有哪几个不同的角度。", "reverse": false}, {"axis": 0, "prompt": "一段持续的机器嗡鸣，会让我越来越难在原来的位置待着。", "reverse": false}, {"axis": 1, "prompt": "到一个又陌生又忙乱的地方时，我需要一点时间才有余力处理手头的事。", "reverse": false}, {"axis": 2, "prompt": "一桌人原本聊得轻松，忽然变安静时，我会留意是谁说了哪句话。", "reverse": false}, {"axis": 3, "prompt": "一小段作品里细腻的细节，会让我觉得这一天多了一点乐趣。", "reverse": false}, {"axis": 4, "prompt": "听人描述一个过程时，我会留意其中两处听起来对不上的细节。", "reverse": false}, {"axis": 5, "prompt": "新任务结束后，我有时会自己重新梳理一遍，看看哪些经验能下次再用。", "reverse": false}, {"axis": 0, "prompt": "同一个空间同时有好几种明显气味时，我会想先去透透气。", "reverse": false}, {"axis": 1, "prompt": "同时听几个人说话时，我容易放弃其中一路，先专注于一个人的话。", "reverse": false}, {"axis": 2, "prompt": "在很合作、彼此有回应的小组里，我会很快感到做事更轻松。", "reverse": false}, {"axis": 3, "prompt": "熟悉但令人愉快的气味，会让我停下来享受几秒。", "reverse": false}, {"axis": 4, "prompt": "看一幅图时，有些在边角或背景里的小细节会先吸引我的注意。", "reverse": false}, {"axis": 5, "prompt": "看见一个生活中的小现象时，我会把它和在别处见过的类似情况联系起来。", "reverse": false}, {"axis": 0, "prompt": "在日常偏亮的商店待上一会儿，我通常感觉自在。", "reverse": true}, {"axis": 1, "prompt": "临时有两三件普通事情同时要处理，我通常还能自然切换。", "reverse": true}, {"axis": 2, "prompt": "同桌的人情绪有起伏时，我的心情大多仍按自己的节奏走。", "reverse": true}, {"axis": 3, "prompt": "普通日子里偶然遇到的小美好，通常很少改变我那一刻的心情。", "reverse": true}, {"axis": 4, "prompt": "布置只改了一小处的熟悉空间，我通常过几次才会留意。", "reverse": true}, {"axis": 5, "prompt": "有意思的经历结束后，我通常会很快转向下一件事，很少再想它的含义。", "reverse": true}, {"axis": 0, "prompt": "衣物稍微刮皮肤时，我穿一会儿就很少再留意。", "reverse": true}, {"axis": 1, "prompt": "一段时间里消息和请求比较多时，我通常还能轻松维持原来的节奏。", "reverse": true}, {"axis": 2, "prompt": "和我无关的一段紧张交流结束后，我通常能很快把注意力放回手里的事。", "reverse": true}, {"axis": 3, "prompt": "一段布置舒服的环境，对我当时的心情通常影响很轻。", "reverse": true}, {"axis": 4, "prompt": "看日常信息时，我常把零碎的细小变化略过去，只留下主要意思。", "reverse": true}, {"axis": 5, "prompt": "看到新的做法时，只要能直接用上，我很少再思考它为什么有效。", "reverse": true}, {"axis": 6, "prompt": "因感觉不适或过载，我很难按预期完成工作、学习或家务。", "reverse": false}, {"axis": 6, "prompt": "日常刺激或反复消化当天经历，影响我按平时的节奏休息或入睡。", "reverse": false}, {"axis": 6, "prompt": "因怕再次过载，我放弃了原本想参加的活动或想维持的来往。", "reverse": false}], "coreCount": 48, "sources": [["Aron 与 Aron（1997）｜感觉加工敏感性初始研究", "https://pubmed.ncbi.nlm.nih.gov/9248053/"], ["Greven 等（2019）｜感觉加工敏感性综述", "https://pubmed.ncbi.nlm.nih.gov/30639671/"], ["感觉加工敏感性概念与测量的修订研究", "https://www.sciencedirect.com/science/article/pii/S0191886926001467"]]};
+'use strict';
+document.documentElement.dataset.theme = config.kind;
+const mbti = config.kind === 'mbti';
+const pageSize = 8;
+const pageTotal = Math.ceil(config.items.length / pageSize);
+const values = Array(config.items.length).fill(null);
+let page = 0;
+
+/** 获取界面元素。参数 id（字符串，元素标识）。返回 HTMLElement（对应元素）。 */
+function get(id) {
+  return document.getElementById(id);
+}
+
+/** 创建文本元素。参数 tag（字符串，标签）、content（字符串，文字）、className（字符串，样式名）。返回 HTMLElement（新元素）。 */
+function element(tag, content = '', className = '') {
+  const node = document.createElement(tag);
+  node.textContent = content;
+  if (className) node.className = className;
+  return node;
+}
+
+/** 展示指定页面。参数 name（字符串，页面标识）。返回无。 */
+function show(name) {
+  for (const id of ['start', 'exam', 'result']) get(id).hidden = id !== name;
+  get('hero').hidden = name !== 'start';
+  window.scrollTo(0, 0);
+}
+
+/** 更新已答进度。参数无。返回无。 */
+function updateProgress() {
+  let finished = 0;
+  for (const value of values) if (value !== null) finished += 1;
+  get('answered').textContent = '已答 ' + finished + ' / ' + values.length;
+  get('progress').max = values.length;
+  get('progress').value = finished;
+}
+
+/** 绘制一道题及选项。参数 item（题目对象）、i（题号索引）。返回 HTMLElement（题目卡片）。 */
+function question(item, i) {
+  const card = element('article', '', 'question');
+  const heading = element('h3');
+  heading.id = 'title-' + i;
+  heading.append(element('span', String(i + 1).padStart(2, '0'), 'qnum'), document.createTextNode(item.prompt));
+  card.append(heading);
+  const group = element('fieldset', '', 'options');
+  group.append(element('legend', '第 ' + (i + 1) + ' 题选项', 'sr'));
+  if (mbti) {
+    const pairs = element('div', '', 'dual');
+    pairs.id = 'pairs-' + i;
+    for (const [letter, text] of [['A', item.a], ['B', item.b]]) {
+      const content = element('p');
+      content.append(element('b', letter), document.createTextNode(text));
+      pairs.append(content);
+    }
+    card.append(pairs);
+    group.setAttribute('aria-describedby', heading.id + ' ' + pairs.id);
+  } else group.setAttribute('aria-describedby', heading.id);
+  for (let j = 0; j < config.choices.length; j += 1) {
+    const label = element('label', '', 'choice');
+    const input = document.createElement('input');
+    input.type = 'radio';
+    input.name = 'q' + i;
+    input.value = String(j);
+    input.checked = values[i] === j;
+    label.append(input, element('span', config.choices[j]));
+    group.append(label);
+  }
+  card.append(group);
+  return card;
+}
+
+/** 打开当前题页并恢复选择。参数无。返回无。 */
+function renderQuestions() {
+  show('exam');
+  get('page-count').textContent = '第 ' + (page + 1) + ' / ' + pageTotal + ' 页';
+  const first = page * pageSize;
+  const last = Math.min(values.length, first + pageSize);
+  const impact = !mbti && first >= config.coreCount;
+  get('page-title').textContent = impact ? '这些体验影响了你的日常吗？' : '第 ' + (first + 1) + '–' + last + ' 题';
+  get('page-help').textContent = impact ? '按近三个月的实际情况回答。下面三题单独解读。' : config.pageHelp;
+  get('questions').replaceChildren();
+  for (let i = first; i < last; i += 1) get('questions').append(question(config.items[i], i));
+  get('message').textContent = '';
+  get('prev').disabled = page === 0;
+  get('next').textContent = page === pageTotal - 1 ? '查看结果' : '下一页';
+  updateProgress();
+  get('page-title').focus({preventScroll:true});
+}
+
+/** 处理单选变化。参数 event（Event，当前修改事件）。返回无。 */
+function answer(event) {
+  const input = event.target;
+  if (!(input instanceof HTMLInputElement) || input.type !== 'radio') return;
+  values[Number(input.name.slice(1))] = Number(input.value);
+  input.closest('.question').classList.remove('missing');
+  get('message').textContent = '';
+  updateProgress();
+}
+
+/** 检查当前题页并继续。参数无。返回无。 */
+function next() {
+  const first = page * pageSize;
+  const last = Math.min(values.length, first + pageSize);
+  for (let i = first; i < last; i += 1) {
+    if (values[i] !== null) continue;
+    const input = document.querySelector('input[name="q' + i + '"]');
+    input.closest('.question').classList.add('missing');
+    get('message').textContent = '第 ' + (i + 1) + ' 题还没选。';
+    input.focus({preventScroll:true});
+    input.closest('.question').scrollIntoView({block:'start'});
+    return;
+  }
+  if (page + 1 < pageTotal) {
+    page += 1;
+    renderQuestions();
+  } else renderResult();
+}
+
+/** 计算四组偏好。参数无。返回对象数组（各维度分数、字母和说明）。 */
+function mbtiScores() {
+  const results = [];
+  for (const [d, axis] of config.axes.entries()) {
+    let score = 0;
+    for (const [i, item] of config.items.entries()) {
+      if (item.axis === d) score += (2 - values[i]) * (item.aLeft ? 1 : -1);
+    }
+    results.push({axis, score, result: Math.abs(score) <= 4 ? 'X' : axis.letters[score > 0 ? 0 : 1]});
+  }
+  return results;
+}
+
+/** 计算六组体验。参数无。返回对象数组（各维度均分和高频题数）。 */
+function hspScores() {
+  const results = [];
+  for (const [d, axis] of config.axes.entries()) {
+    let total = 0;
+    let frequent = 0;
+    let valid = 0;
+    for (const [i, item] of config.items.entries()) {
+      if (item.axis !== d || values[i] === 5) continue;
+      valid += 1;
+      const score = item.reverse ? 5 - values[i] : values[i] + 1;
+      total += score;
+      if (score >= 4) frequent += 1;
+    }
+    results.push({axis, mean: valid ? total / valid : null, frequent, valid});
+  }
+  return results;
+}
+
+/** 制作结果分数轨道。参数 position（数字，百分位置）、centered（布尔，是否以中线为基准）。返回 HTMLElement（分数图）。 */
+function track(position, centered) {
+  const line = element('div', '', 'track' + (centered ? ' mbti' : ''));
+  const mark = element('div', '', centered ? 'dot' : 'fill');
+  line.setAttribute('aria-hidden', 'true');
+  mark.style[centered ? 'left' : 'width'] = position + '%';
+  line.append(mark);
+  return line;
+}
+
+/** 生成一个维度的结果卡。参数 result（维度分数对象）。返回 HTMLElement（解释卡）。 */
+function resultCard(result) {
+  const card = element('article', '', 'report-card');
+  card.append(element('h3', result.axis.title));
+  if (mbti) {
+    const {axis, score} = result;
+    const verdict = result.result === 'X' ? '两边接近' : '本次更靠近 ' + result.result;
+    const numeric = (score > 0 ? '+' : '') + score;
+    const ends = element('div', '', 'scales');
+    ends.append(element('span', axis.letters[0]), element('span', '接近'), element('span', axis.letters[1]));
+    card.append(element('strong', verdict + '　｜　偏向分 ' + numeric), track(50 - score / 64 * 100, true), ends, element('p', axis.explain));
+  } else {
+    if (result.valid >= 6) {
+      card.append(element('strong', result.mean.toFixed(1) + ' / 5　｜　' + result.frequent + ' / ' + result.valid + ' 题高频'),
+        track((result.mean - 1) * 25, false), element('p', result.axis.explain), element('p', result.axis.action));
+    } else card.append(element('strong', '本组资料不足　｜　' + result.valid + ' / 8 题可判断'), element('p', result.axis.explain));
+  }
+  return card;
+}
+
+/** 展示报告、计分解释与可选动作。参数无。返回无。 */
+function renderResult() {
+  show('result');
+  const results = mbti ? mbtiScores() : hspScores();
+  get('cards').replaceChildren();
+  for (const result of results) get('cards').append(resultCard(result));
+  const follow = get('follow');
+  if (mbti) {
+    let code = '';
+    for (const result of results) code += result.result;
+    get('outcome').textContent = code;
+    get('summary-text').textContent = code.includes('X')
+      ? 'X 表示这一组的两侧得分接近。例如 INXJ 可以对照 INTJ 和 INFJ 的偏好描述，先看看自己在不同场合的做法。'
+      : '这是本次答案组合出的四字母候选。可以从下面四组描述里找贴近自己的部分，再用现实例子核对。';
+    follow.replaceChildren(element('h2', '找一个现实例子来对照'),
+      element('p', '选一组你最不确定的偏好，回想一次无人要求你扮演某种角色的场合。写下当时你先做了什么、为什么选它、换个环境会不会不同。'),
+      element('p', 'E / I 与谈话技巧是不同的问题。T / F 也不表示谁更理性或更体贴。四组偏好都允许你在不同场合使用两种方法。'));
+  } else {
+    let matched = 0;
+    let eligible = 0;
+    for (const result of results) {
+      if (result.valid < 6) continue;
+      eligible += 1;
+      if (result.frequent >= Math.ceil(result.valid * 5 / 8)) matched += 1;
+    }
+    let description = '本次没有成组的高频体验';
+    if (matched >= 1) description = '部分体验比较常见';
+    if (matched >= 4) description = '多方面体验比较常见';
+    if (eligible < 4) description = '可解读的体验组较少';
+    get('outcome').textContent = description;
+    get('summary-text').textContent = '六组中有 ' + eligible + ' 组信息足够解读，其中 ' + matched + ' 组的高频回答达到本问卷的展示门槛。可以结合下方各组和具体场景看。';
+    follow.replaceChildren(element('h2', '单独看日常影响'));
+    let considerable = false;
+    for (const [j, label] of ['工作、学习与家务','休息或入睡','活动参与和来往'].entries()) {
+      const level = values[config.coreCount + j];
+      if (level === 3 || level === 4) considerable = true;
+      follow.append(element('p', label + '：' + config.choices[level]));
+    }
+    follow.append(element('p', considerable
+      ? '至少一个领域经常受影响。可以记录最常见的触发、持续时间和缓解办法。若持续影响生活，可把记录带给合格专业人员进一步评估。'
+      : '如果想验证体验和环境的关系，可以选一组，在两个相似场合只改一个条件，例如座位、音量或停留时间。'));
+  }
+  get('scoring').textContent = config.scoring;
+  get('outcome').focus({preventScroll:true});
+}
+
+/** 构建打印用题目，并调用打印。参数无。返回无。 */
+function printPaper() {
+  const paper = get('paper');
+  if (!paper.childElementCount) {
+    paper.append(element('h1', config.title), element('p', config.instructions + '　' + config.scope),
+      element('p', '在每题下选一项。答完后可在电子版录入所选项，自动生成结果。'));
+    for (const [i, item] of config.items.entries()) {
+      const row = element('div', '', 'print-q');
+      row.append(element('h3', (i + 1) + '．' + item.prompt));
+      if (mbti) row.append(element('p', 'A　' + item.a + '　　B　' + item.b));
+      row.append(element('p', '○ ' + config.choices.join('　　○ ')));
+      paper.append(row);
+    }
+  }
+  document.body.dataset.print = 'paper';
+  window.print();
+}
+
+/** 打印当前结果。参数无。返回无。 */
+function printResult() {
+  document.body.dataset.print = 'result';
+  window.print();
+}
+
+/** 回上一题页。参数无。返回无。 */
+function previous() {
+  if (page === 0) return;
+  page -= 1;
+  renderQuestions();
+}
+
+/** 清空已答选项后回到首页。参数无。返回无。 */
+function restart() {
+  if (!window.confirm('清空本次全部答案并从第一题开始？')) return;
+  values.fill(null);
+  page = 0;
+  show('start');
+  get('begin').focus();
+}
+
+for (const id of ['time','eyebrow','title','intro','instructions','scope','method']) get(id).textContent = config[id];
+for (const [name, url] of config.sources) {
+  const link = element('a', name);
+  link.href = url;
+  link.target = '_blank';
+  link.rel = 'noopener noreferrer';
+  const item = element('li');
+  item.append(link);
+  get('source-list').append(item);
+}
+get('begin').addEventListener('click', renderQuestions);
+get('questions').addEventListener('change', answer);
+get('next').addEventListener('click', next);
+get('prev').addEventListener('click', previous);
+get('review').addEventListener('click', renderQuestions);
+get('restart').addEventListener('click', restart);
+get('print-paper').addEventListener('click', printPaper);
+get('print-result').addEventListener('click', printResult);
+
+
+
+
+</script>
+</body>
+</html>
+
+
